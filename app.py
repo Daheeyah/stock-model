@@ -5,9 +5,12 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, LSTM, GRU, Dropout
-from tensorflow.keras.callbacks import EarlyStopping
+import os
+os.environ['KERAS_BACKEND'] = 'tensorflow'
+
+from keras.models import Sequential
+from keras.layers import Dense, LSTM, GRU, Dropout
+from keras.callbacks import EarlyStopping
 import datetime
 from datetime import date
 import warnings
