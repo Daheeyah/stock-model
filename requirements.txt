@@ -5,4 +5,3 @@ yfinance
 matplotlib
 scikit-learn
 keras
-tensorflow
