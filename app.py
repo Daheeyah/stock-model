@@ -11,9 +11,8 @@ os.environ['KERAS_BACKEND'] = 'tensorflow'
 import os
 os.environ['KERAS_BACKEND'] = 'tensorflow'
 
-from keras.models import Sequential
-from keras.layers import Dense, LSTM, GRU, Dropout
-from keras.callbacks import EarlyStopping
+import torch
+import torch.nn as nn
 import datetime
 from datetime import date
 import warnings
