@@ -4,4 +4,4 @@ pandas
 yfinance
 matplotlib
 scikit-learn
-keras
+torch
