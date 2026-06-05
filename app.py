@@ -8,6 +8,9 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import os
 os.environ['KERAS_BACKEND'] = 'tensorflow'
 
+import os
+os.environ['KERAS_BACKEND'] = 'tensorflow'
+
 from keras.models import Sequential
 from keras.layers import Dense, LSTM, GRU, Dropout
 from keras.callbacks import EarlyStopping
