@@ -8,11 +8,9 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import os
 os.environ['KERAS_BACKEND'] = 'tensorflow'
 
-import os
-os.environ['KERAS_BACKEND'] = 'tensorflow'
-
-import torch
-import torch.nn as nn
+from keras.models import Sequential
+from keras.layers import Dense, LSTM, GRU, Dropout
+from keras.callbacks import EarlyStopping
 import datetime
 from datetime import date
 import warnings
@@ -54,7 +52,16 @@ predict_button = st.sidebar.button("🚀 Run Prediction", type="primary")
 @st.cache_data
 def load_data(symbol, start, end):
     try:
-        data = yf.download(symbol, start=start, end=end, progress=False)
+        if start > end:
+            st.error("Start date must be before end date.")
+            return None
+        data = yf.download(symbol, start=start, end=end, progress=False, auto_adjust=False)
+        if data.empty:
+            st.error(f"No data found for {symbol} in the selected date range. Please try a different range.")
+            return None
+        # Flatten MultiIndex columns if present
+        if isinstance(data.columns, pd.MultiIndex):
+            data.columns = data.columns.get_level_values(0)
         return data
     except Exception as e:
         st.error(f"Error downloading data: {e}")
@@ -128,18 +135,29 @@ if predict_button:
             df = load_data(stock_symbol, start_date, end_date)
         
         if df is not None and len(df) > 0:
+            # Check for Close column
+            if 'Close' not in df.columns:
+                st.error(f"'Close' column not found. Available columns: {list(df.columns)}")
+                st.stop()
+            
+            # Check for valid data
+            latest_close = df['Close'].iloc[-1]
+            if pd.isna(latest_close):
+                st.warning("The latest closing price is unavailable. Please try a different date range.")
+                st.stop()
+            
             # Display stock data
             st.subheader(f"📊 {stock_symbol} Stock Data")
             
             col1, col2, col3, col4 = st.columns(4)
             with col1:
-                st.metric("Latest Close", f"${df['Close'].iloc[-1]:.2f}")
+                st.metric("Latest Close", f"${latest_close:.2f}")
             with col2:
                 st.metric("Highest", f"${df['Close'].max():.2f}")
             with col3:
                 st.metric("Lowest", f"${df['Close'].min():.2f}")
             with col4:
-                change = ((df['Close'].iloc[-1] - df['Close'].iloc[0]) / df['Close'].iloc[0]) * 100
+                change = ((latest_close - df['Close'].iloc[0]) / df['Close'].iloc[0]) * 100
                 st.metric("Total Change", f"{change:.2f}%")
             
             # Plot historical data
@@ -380,4 +398,4 @@ else:
 
 # Footer
 st.markdown("---")
-st.markdown("Built with ❤️ using Streamlit | Data from Yahoo Finance")
+st.markdown("Built with ❤️ FROM GROUP 18 using Streamlit | Data from Yahoo Finance")
